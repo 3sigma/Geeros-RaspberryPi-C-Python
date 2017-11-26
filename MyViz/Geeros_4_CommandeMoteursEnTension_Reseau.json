@@ -1,0 +1,254 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "Tracés",
+			"width": 1,
+			"row": {
+				"2": 9,
+				"3": 1,
+				"4": 1,
+				"5": 7
+			},
+			"col": {
+				"2": 2,
+				"3": 2,
+				"4": 3,
+				"5": 3
+			},
+			"col_width": "2",
+			"widgets": [
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Tension et vitesse",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"time_window": "4",
+						"value": [
+							"datasources[\"ws\"][\"Consigne\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]"
+						],
+						"y_axis_min_range": "-1,1",
+						"y2_axis_min_range": "-10,10",
+						"include_legend": true,
+						"legendStr": "Tension (V),Vitesse mot. droit (rad/s), Vitesse mot. gauche (rad/s)",
+						"height": 4,
+						"pausable": true
+					}
+				}
+			]
+		},
+		{
+			"title": "Démarrage",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "sshcommand",
+					"settings": {
+						"title": "Marche / Arrêt de l'application",
+						"style": "switch",
+						"host": "192.168.0.199",
+						"login": "root",
+						"password": "raspberrypi",
+						"oncommand": "/root/programmes_python/startCommandeEnTension2.sh",
+						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
+						"ontext": "ON",
+						"offtext": "OFF",
+						"initialstate": false,
+						"caption": "Switch ON"
+					}
+				}
+			]
+		},
+		{
+			"title": "Consignes moteurs",
+			"width": 1,
+			"row": {
+				"3": 5,
+				"4": 1,
+				"5": 9
+			},
+			"col": {
+				"3": 1,
+				"4": 2,
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "select",
+					"settings": {
+						"title": "Moteur à piloter",
+						"variable": "datasources[\"ws\"][\"moteurint\"]",
+						"listcaptions": "Moteur droit,Moteur gauche,Les deux,Aucun",
+						"listvalues": "0,1,2,3"
+					}
+				},
+				{
+					"type": "switchbutton",
+					"settings": {
+						"title": "Type de signal (carré ou sinus)",
+						"variable": "datasources[\"ws\"][\"typeSignal\"]",
+						"yestext": "Sinus",
+						"notext": "Carré",
+						"initialstate": false
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Offset",
+						"variable": "datasources[\"ws\"][\"offset\"]",
+						"formula": "x",
+						"initialvalue": 0,
+						"min": -6,
+						"max": 6,
+						"resolution": 1,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Amplitude",
+						"variable": "datasources[\"ws\"][\"amplitude\"]",
+						"formula": "x",
+						"initialvalue": 0,
+						"min": 0,
+						"max": 6,
+						"resolution": 1,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Fréquence",
+						"variable": "datasources[\"ws\"][\"frequence\"]",
+						"formula": "x",
+						"initialvalue": 0,
+						"min": 0,
+						"max": 5,
+						"resolution": 2,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				}
+			]
+		},
+		{
+			"title": "Moniteur",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 23
+			},
+			"col": {
+				"3": 2,
+				"4": 1
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "textarea",
+					"settings": {
+						"nblines_window": "5",
+						"value": [
+							"datasources[\"ws\"][\"Raw\"]"
+						]
+					}
+				}
+			]
+		},
+		{
+			"title": "Vitesse moteurs",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 9,
+				"5": 9
+			},
+			"col": {
+				"3": 3,
+				"4": 4,
+				"5": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Moteur droit",
+						"size": "regular",
+						"value": "datasources[\"ws\"][\"omegaDroit\"]",
+						"animate": false,
+						"units": "rad/s"
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Moteur gauche",
+						"size": "regular",
+						"value": "datasources[\"ws\"][\"omegaGauche\"]",
+						"animate": false,
+						"units": "rad/s"
+					}
+				}
+			]
+		},
+		{
+			"title": "Tension batterie",
+			"width": 1,
+			"row": {
+				"3": 17,
+				"4": 17
+			},
+			"col": {
+				"3": 3,
+				"4": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "gauge",
+					"settings": {
+						"value": "datasources[\"ws\"][\"TensionAlim\"]",
+						"units": "V",
+						"min_value": "6.4",
+						"max_value": "8.4"
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "ws",
+			"type": "websocket",
+			"settings": {
+				"host": "ws://192.168.0.199:9090/ws",
+				"variables_to_send": "typeSignal,offset,amplitude,frequence,moteurint",
+				"refresh_rate": 500,
+				"checksum": "none",
+				"name": "ws"
+			}
+		}
+	],
+	"columns": 3
+}

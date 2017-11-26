@@ -1,0 +1,251 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "Tracés",
+			"width": 1,
+			"row": {
+				"2": 9,
+				"3": 1,
+				"4": 1,
+				"5": 7
+			},
+			"col": {
+				"2": 2,
+				"3": 2,
+				"4": 3,
+				"5": 3
+			},
+			"col_width": "2",
+			"widgets": [
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Tension et vitesse",
+						"xaxis": "datasource_column",
+						"time": "if (datasources[\"sp\"][\"Temps\"] != datasources[\"sp\"][\"TCopie\"]) {\n    return -100;\n}\nelse {\n    return datasources[\"sp\"][\"Temps\"];\n}\n",
+						"time_window": "4",
+						"value": [
+							"datasources[\"sp\"][\"Consigne\"]",
+							"datasources[\"sp\"][\"omegaDroit\"]",
+							"datasources[\"sp\"][\"omegaGauche\"]"
+						],
+						"y_axis_min_range": "-1,1",
+						"y2_axis_min_range": "-10,10",
+						"include_legend": true,
+						"legendStr": "Tension (V),Vitesse mot. droit (rad/s), Vitesse mot. gauche (rad/s)",
+						"height": 4,
+						"pausable": true
+					}
+				}
+			]
+		},
+		{
+			"title": "Marche / Arrêt port série",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "switchserialport",
+					"settings": {
+						"serialport": "sp",
+						"ontext": "ON",
+						"offtext": "OFF",
+						"initialstate": false
+					}
+				}
+			]
+		},
+		{
+			"title": "Consignes moteurs",
+			"width": 1,
+			"row": {
+				"3": 5,
+				"4": 1,
+				"5": 9
+			},
+			"col": {
+				"3": 1,
+				"4": 2,
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "select",
+					"settings": {
+						"title": "Moteur à piloter",
+						"variable": "datasources[\"sp\"][\"moteurint\"]",
+						"listcaptions": "Moteur droit,Moteur gauche,Les deux,Aucun",
+						"listvalues": "0,1,2,3"
+					}
+				},
+				{
+					"type": "switchbutton",
+					"settings": {
+						"title": "Type de signal (carré ou sinus)",
+						"variable": "datasources[\"sp\"][\"typeSignal\"]",
+						"yestext": "Sinus",
+						"notext": "Carré",
+						"initialstate": false
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Offset",
+						"variable": "datasources[\"sp\"][\"offset\"]",
+						"formula": "(10*x+60).toFixed(0)",
+						"initialvalue": 0,
+						"min": -6,
+						"max": 6,
+						"resolution": 1,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Amplitude",
+						"variable": "datasources[\"sp\"][\"amplitude\"]",
+						"formula": "(10*x).toFixed(0)",
+						"initialvalue": 0,
+						"min": 0,
+						"max": 6,
+						"resolution": 1,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Fréquence",
+						"variable": "datasources[\"sp\"][\"frequence\"]",
+						"formula": "(100*x).toFixed(0)",
+						"initialvalue": 0,
+						"min": 0,
+						"max": 5,
+						"resolution": 2,
+						"resetvalue": 0,
+						"resetcaption": "Reset"
+					}
+				}
+			]
+		},
+		{
+			"title": "Moniteur",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 23
+			},
+			"col": {
+				"3": 2,
+				"4": 1
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "textarea",
+					"settings": {
+						"nblines_window": "5",
+						"value": [
+							"datasources[\"sp\"][\"_rawdata\"]"
+						]
+					}
+				}
+			]
+		},
+		{
+			"title": "Vitesse moteurs",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 9,
+				"5": 9
+			},
+			"col": {
+				"3": 3,
+				"4": 4,
+				"5": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Moteur droit",
+						"size": "regular",
+						"value": "datasources[\"sp\"][\"omegaDroit\"]",
+						"animate": false,
+						"units": "rad/s"
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Moteur gauche",
+						"size": "regular",
+						"value": "datasources[\"sp\"][\"omegaGauche\"]",
+						"animate": false,
+						"units": "rad/s"
+					}
+				}
+			]
+		},
+		{
+			"title": "Tension batterie",
+			"width": 1,
+			"row": {
+				"3": 17,
+				"4": 17
+			},
+			"col": {
+				"3": 3,
+				"4": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "gauge",
+					"settings": {
+						"value": "datasources[\"sp\"][\"TensionAlim\"]",
+						"units": "V",
+						"min_value": "6.4",
+						"max_value": "8.4"
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "sp",
+			"type": "serialport",
+			"settings": {
+				"port": "COM26",
+				"baudrate": 115200,
+				"variables_to_read": "Temps,TCopie,Consigne,omegaDroit,omegaGauche,TensionAlim",
+				"variables_to_send": "typeSignal,offset,amplitude,frequence,moteurint",
+				"refresh_rate": "500",
+				"separator": ",",
+				"checksum": "sum",
+				"immediate_startup": false,
+				"name": "sp"
+			}
+		}
+	],
+	"columns": 3
+}

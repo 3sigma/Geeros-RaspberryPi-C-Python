@@ -1,0 +1,300 @@
+{
+	"version": 1,
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "Télémétrie",
+			"width": 1,
+			"row": {
+				"2": 9,
+				"3": 1,
+				"4": 1,
+				"5": 7
+			},
+			"col": {
+				"2": 2,
+				"3": 2,
+				"4": 3,
+				"5": 3
+			},
+			"col_width": "2",
+			"widgets": [
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Vitesses longitudinales (m/s)",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"time_window": 10,
+						"value": [
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]"
+						],
+						"y_axis_min_range": "-0.2,0.2",
+						"y2_axis_min_range": "-10,10",
+						"include_legend": true,
+						"legendStr": "vxref,vxmes",
+						"height": 4,
+						"pausable": true
+					}
+				},
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Vitesse de rotation (deg/s)",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"time_window": 10,
+						"value": [
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]"
+						],
+						"y_axis_min_range": "-0.1,0.1",
+						"y2_axis_min_range": "-10,10",
+						"include_legend": true,
+						"legendStr": "xiref,ximes",
+						"height": 4,
+						"pausable": true
+					}
+				}
+			]
+		},
+		{
+			"title": "Démarrage",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 9
+			},
+			"col": {
+				"3": 1,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "sshcommand",
+					"settings": {
+						"title": "Marche / Arrêt de l'application",
+						"style": "switch",
+						"host": "192.168.0.199",
+						"login": "root",
+						"password": "raspberrypi",
+						"oncommand": "/root/programmes_python/startGeerosAvecBoules.sh",
+						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
+						"ontext": "ON",
+						"offtext": "OFF",
+						"initialstate": false,
+						"caption": "Switch ON"
+					}
+				}
+			]
+		},
+		{
+			"title": "Pilotage",
+			"width": 1,
+			"row": {
+				"3": 5,
+				"4": 1
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "joypad2roues",
+					"settings": {
+						"title": "Vitesses de consigne",
+						"variablevxref": "datasources[\"ws\"][\"vref\"]",
+						"gain_longi": 1,
+						"variablexiref": "datasources[\"ws\"][\"xiref\"]",
+						"gain_rot": "-1"
+					}
+				}
+			]
+		},
+		{
+			"title": "Servomoteur",
+			"width": 1,
+			"row": {
+				"3": 15,
+				"4": 15
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Angle de consigne",
+						"variable": "datasources[\"ws\"][\"servoref\"]",
+						"formula": "(x).toFixed(0)",
+						"initialvalue": 45,
+						"min": 20,
+						"max": 70,
+						"resolution": 0,
+						"resetvalue": 45,
+						"resetcaption": "Réinitialisation"
+					}
+				}
+			]
+		},
+		{
+			"title": "Gains PID longitudinal",
+			"width": 1,
+			"row": {
+				"3": 19,
+				"4": 19
+			},
+			"col": {
+				"3": 2,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Kp",
+						"variable": "datasources[\"ws\"][\"Kp\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Ki",
+						"variable": "datasources[\"ws\"][\"Ki\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Kd",
+						"variable": "datasources[\"ws\"][\"Kd\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				}
+			]
+		},
+		{
+			"title": "Gains PID rotation",
+			"width": 1,
+			"row": {
+				"3": 19,
+				"4": 19
+			},
+			"col": {
+				"3": 3,
+				"4": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Kp",
+						"variable": "datasources[\"ws\"][\"Kpxi\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Ki",
+						"variable": "datasources[\"ws\"][\"Kixi\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Facteur multiplicatif sur Kd",
+						"variable": "datasources[\"ws\"][\"Kdxi\"]",
+						"formula": "x",
+						"initialvalue": 1,
+						"min": 0,
+						"max": 2,
+						"resolution": 2,
+						"resetvalue": 1,
+						"resetcaption": "Réinitialisation"
+					}
+				}
+			]
+		},
+		{
+			"title": "Moniteur",
+			"width": 1,
+			"row": {
+				"3": 21,
+				"4": 23
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "textarea",
+					"settings": {
+						"nblines_window": "10",
+						"value": [
+							"datasources[\"ws\"][\"Raw\"]"
+						]
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "ws",
+			"type": "websocket",
+			"settings": {
+				"host": "ws://192.168.0.199:9090/ws",
+				"variables_to_send": "vref,xiref,servoref,Kp,Ki,Kd,Kpxi,Kixi,Kdxi",
+				"refresh_rate": "500",
+				"checksum": "none"
+			}
+		}
+	],
+	"columns": 3
+}
