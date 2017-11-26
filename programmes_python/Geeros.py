@@ -1,16 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+##################################################################################
+# Programme de pilotage du robot Geeros disponible à l'adresse:
+# http://boutique.3sigma.fr/12-robots
+#
+# Auteur: 3Sigma
+# Version 3.0 - 01/10/2017
+##################################################################################
+
 # Import WiringPi2
 import wiringpi2
 
-# Imports pour l'i2c
-from a_star import AStar
-a_star = AStar()
-
 # Imports pour l'IMU sur bus i2c
 import smbus
-import FaBo9Axis_MPU9250
+from mpu9250 import MPU9250
 
 import time, sched
 import os
@@ -32,17 +36,22 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 
+# Imports pour la communication i2c avec la carte Pololu A-Star
+from a_star import AStar
+a_star = AStar()
+
 # Entete declarative
 Nmoy = 10
-omegaDroit = 0
 codeurDroitDeltaPos = 0
-omegaGauche = 0
+codeurDroitDeltaPosPrec = 0
 codeurGaucheDeltaPos = 0
+codeurGaucheDeltaPosPrec = 0
+omegaDroit = 0
+omegaGauche = 0
 
 omega = 0.
 thetames = 0.
 
-tensionBatterie = 7.4
 
 # Les moteurs sont asservis en vitesse grâce à un régulateur de type PID
 # On déclare ci-dessous les variables et paramètres nécessaires à l'asservissement et au régulateur
@@ -51,7 +60,7 @@ W = 0.14 # Largeur du robot
 umax = 6. # valeur max de la tension de commande du moteur
 umin = -6. # valeur min (ou max en négatif) de la tension de commande du moteur
 vxmes = 0. # vitesse longitudinale mesurée
-xidotmes = 0. # vitesse de rotation mesurée
+ximes = 0. # vitesse de rotation mesurée
 Tf = 0.02 # constante de temps de filtrage de l'action dérivée du PID
 Kpvx1 = -18.2 # sous-gain proportionnel pour l'asservissement de vitesse longitudinale
 Kpvx2 = 0.132 # sous-gain proportionnel pour l'asservissement de vitesse longitudinale
@@ -71,8 +80,6 @@ P_xidot = 0. # action proportionnelle pour l'asservissement de rotation
 I_xidot = 0. # action intégrale pour l'asservissement de rotation
 thetaest = 0. # angle d'inclinaison estimé par le filtre complémentaire
 tau = 1. # paramètre du filtre complémentaire
-codeurDroitDeltaPosPrec = 0.
-codeurGaucheDeltaPosPrec = 0.
 
 commandeDroit = 0. # commande en tension calculée par le PID pour le moteur droit
 commandeGauche = 0. # commande en tension calculée par le PID pour le moteur gauche
@@ -88,7 +95,7 @@ Kixi2 = 1.
 
 # Déclarations pour les consignes de mouvement
 vxref = 0.
-xidotref = 0.
+xiref = 0.
 omegaref = 0.
 thetaref = 0.
 
@@ -101,32 +108,55 @@ omegaprec = 0
 
 # Time out de réception des données
 timeout = 2
-timeLastReceived = 0
-timedOut = False
+timeLastReceived = time.time()
 
+T0 = time.time()
 dt = 0.01
 tprec = time.time()
 i = 0
 # Création d'un scheduler pour exécuter des opérations à cadence fixe
 s = sched.scheduler(time.time, time.sleep)
 
+# Lecture de la tension d'alimentation
+idecimLectureTension = 0
+decimLectureTension = 6000
+tensionAlim = 7.4
+# Sécurité sur la tension d'alimentation
+tensionAlimMin = 6.4;
+
 
 #--- setup --- 
 def setup():
-    global imu, signe_ax
+    global imu, signe_ax, tensionAlim
     
     wiringpi2.wiringPiSetupGpio() # For GPIO pin numbering
 
     # Initialisation de l'IMU
-    imu = FaBo9Axis_MPU9250.MPU9250()
+    # initIMU_OK = False
+    # while not initIMU_OK:
+        # try:
+            # imu = MPU9250()
+            # initIMU_OK = True
+        # except:
+            # print("Erreur init IMU")
+    imu = MPU9250()
     
     # On démarre seulement quand le gyropode dépasse la verticale
     # Pour que le gyropode démarre tout seul quand il est sur l'avant
     # et si on le redresse quand il est sur l'arrière
     signe_ax = -1
   
-    CommandeMoteurs(0, 0, tensionBatterie)
+    CommandeMoteurs(0, 0, tensionAlim)
     
+    # Mesure de la tension d'alimentation
+    try:
+        tensionAlimBrute = a_star.read_battery_millivolts()
+        tensionAlimAvantMax = tensionAlimBrute / 1000.;
+        tensionAlim = max(tensionAlimMin, tensionAlimAvantMax);
+        print "Tension d'alimentation", tensionAlim
+    except:
+        print "Probleme lecture tension d'alimentation"
+        pass
 
     
 # -- fin setup -- 
@@ -143,9 +173,10 @@ def loop():
 def CalculVitesse():
     global ticksCodeurDroit, ticksCodeurGauche, indiceTicksCodeurDroit, indiceTicksCodeurGauche, started, omega, thetames, \
         omegaDroit, omegaGauche, ticksCodeurDroitTab, ticksCodeurGaucheTab, thetamesprec, omegaprec, codeurDroitDeltaPosPrec, codeurGaucheDeltaPosPrec, \
-        P_vx, I_vx, P_xidot, I_xidot, imu, thetaest, tau, omegaref, thetaref, timeLastReceived, timeout, timedOut, \
-        codeurDroitDeltaPos, codeurGaucheDeltaPos, commandeDroit, commandeGauche, vxmes, xidotmes, vxref, xidotref, juststarted, \
-        startedGeeros, signe_ax, x1, x2, dt2, tprec, commandeDroitPrec, commandeGauchePrec
+        P_vx, I_vx, P_xidot, I_xidot, imu, thetaest, tau, omegaref, thetaref, timeLastReceived, timeout, \
+        codeurDroitDeltaPos, codeurGaucheDeltaPos, commandeDroit, commandeGauche, vxmes, ximes, vxref, xiref, juststarted, \
+        startedGeeros, signe_ax, x1, x2, dt2, tprec, commandeDroitPrec, commandeGauchePrec, \
+        idecimLectureTension, decimLectureTension, tensionAlim
         
     debut = time.time()
     
@@ -190,19 +221,26 @@ def CalculVitesse():
 
     # Mesure de la vitesse des moteurs grâce aux codeurs incrémentaux
     try:
-        codeurGaucheDeltaPos = a_star.read_codeurGaucheDeltaPos()
         codeurDroitDeltaPos = a_star.read_codeurDroitDeltaPos()
-        if abs(codeurGaucheDeltaPos) > 1000 or abs(codeurDroitDeltaPos) > 1000:
-            print "Values out of range"
-            codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
+        if abs(codeurDroitDeltaPos) > 1000:
+            #print "Values out of range"
             codeurDroitDeltaPos = codeurDroitDeltaPosPrec
         else:
-            codeurGaucheDeltaPosPrec = codeurGaucheDeltaPos
             codeurDroitDeltaPosPrec = codeurDroitDeltaPos
     except:
-        print "Error getting data"
-        codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
+        #print "Erreur lecture codeur droit"
         codeurDroitDeltaPos = codeurDroitDeltaPosPrec
+
+    try:
+        codeurGaucheDeltaPos = a_star.read_codeurGaucheDeltaPos()
+        if abs(codeurGaucheDeltaPos) > 1000:
+            #print "Values out of range"
+            codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
+        else:
+            codeurGaucheDeltaPosPrec = codeurGaucheDeltaPos
+    except:
+        #print "Erreur lecture codeur gauche"
+        codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
 
     # C'est bien dt qu'on utilise ici et non pas dt2 (voir plus loin l'explication de dt2)
     # car codeurDroitDeltaPos et codeurGaucheDeltaPos sont mesurés en temps-réel par l'A*
@@ -262,19 +300,18 @@ def CalculVitesse():
 
         
     # Si on n'a pas reçu de données depuis un certain temps, celles-ci sont annulées
-    if (time.time()-timeLastReceived) > timeout and not timedOut:
-        timedOut = True
+    if (time.time()-timeLastReceived) > timeout:
         x1 = 0.
         x2 = 0.
 
     # Application de la consigne lue
     vxref = x1 * en
-    xidotref = x2 * en
+    xiref = x2 * en
 
     # Définition des entrées de la fonction d'asservissement
     vxmes = (omegaDroit + omegaGauche)*R/2 * en
     omegames = omega * en
-    xidotmes = -(omegaDroit - omegaGauche)*R/W * en
+    ximes = -(omegaDroit - omegaGauche)*R/W * en
 
     # Calcul du PI sur vx
     Kpvx = (Kpvx1 + Kpvx2/R) * Kp2
@@ -307,14 +344,14 @@ def CalculVitesse():
     # Calcul du PI sur xidot
     
     # Terme proportionnel
-    P_xidot = Kpxidot * (xidotref - xidotmes)
+    P_xidot = Kpxidot * (xiref - ximes)
 
     # Calcul de la commande
     commande_xidot = P_xidot + I_xidot
 
 
     # Terme intégral (sera utilisé lors du pas d'échantillonnage suivant)
-    I_xidot = I_xidot + Kixidot * Kixi2 * dt2 * (xidotref - xidotmes)
+    I_xidot = I_xidot + Kixidot * Kixi2 * dt2 * (xiref - ximes)
 
     # Fin Calcul du PI sur xidot
 
@@ -323,8 +360,21 @@ def CalculVitesse():
     commandeDroit = (commande_vx + commande_omega - commande_xidot) * en
     commandeGauche = (commande_vx + commande_omega + commande_xidot) * en
       
-    CommandeMoteurs(commandeDroit, commandeGauche, tensionBatterie)
+    CommandeMoteurs(commandeDroit, commandeGauche, tensionAlim)
     
+    # Lecture de la tension d'alimentation
+    if idecimLectureTension >= decimLectureTension:
+        try:
+            tensionAlimBrute = a_star.read_battery_millivolts()
+            tensionAlimAvantMax = tensionAlimBrute / 1000.;
+            tensionAlim = max(tensionAlimMin, tensionAlimAvantMax);
+            idecimLectureTension = 0
+        except:
+            print "Probleme lecture tension d'alimentation"
+            pass
+    else:
+        idecimLectureTension = idecimLectureTension + 1
+
     
 
     
@@ -379,18 +429,17 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.callback.start()
     
     def on_message(self, message):
-        global x1, x2, Kp2, Ki2, Kpxi2, Kixi2, timeLastReceived, timedOut
+        global x1, x2, Kp2, Ki2, Kpxi2, Kixi2, timeLastReceived, socketOK
         jsonMessage = json.loads(message)
         
         # Annulation du timeout de réception des données
         timeLastReceived = time.time()
-        timedOut = False;
       
         if jsonMessage.get('vref') != None:
-            x1 = float(jsonMessage.get('vref'))
+            x1 = float(jsonMessage.get('vref')) / 100
             #print ("x1: %.2f" % x1)
-        if jsonMessage.get('psidotref') != None:
-            x2 = (float(jsonMessage.get('psidotref'))) * 3.141592 / 180
+        if jsonMessage.get('xiref') != None:
+            x2 = (float(jsonMessage.get('xiref'))) * 3.141592 / 180
             #print ("x2: %.2f" % x2)
         if jsonMessage.get('servoref') != None:
             servoref = int(jsonMessage.get('servoref'))
@@ -409,6 +458,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             Kixi2 = float(jsonMessage.get('Kixi2ref'))
             #print ("Kixi2: %.2f" % Kixi2)
         
+        if not socketOK:
+            x1 = 0
+            x2 = 0.
+  
 
     def on_close(self):
         global socketOK, commandeDroit, commandeGauche
@@ -418,10 +471,32 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         commandeGauche = 0.
 
     def sendToSocket(self):
-        global started, codeurDroitDeltaPos, codeurGaucheDeltaPos, socketOK, commandeDroit, commandeGauche, vxref, xidotref, vxmes, xidotmes, omega, thetames, T0
+        global started, codeurDroitDeltaPos, codeurGaucheDeltaPos, socketOK, commandeDroit, commandeGauche, vxref, xiref, \
+                vxmes, ximes, omega, thetames, T0
         
         tcourant = time.time() - T0
-        aEnvoyer = json.dumps({'Temps':("%.2f" % tcourant), 'commandeDroit':("%.2f" % commandeDroit), 'commandeGauche':("%.2f" % commandeGauche), 'omega':("%.3f" % omega), 'omegaDroit':("%.2f" % omegaDroit), 'omegaGauche':("%.2f" % omegaGauche), 'thetames':("%.3f" % thetames), 'Consigne vitesse longitudinale':("%.2f" % x1), 'Consigne vitesse de rotation':("%.2f" % x2), 'Vitesse longitudinale':("%.2f" % vxmes), 'Vitesse de rotation':("%.2f" % (180 * xidotmes/3.141592)), 'Raw':("%.2f" % tcourant) + "," + ("%.2f" % commandeDroit) + "," + ("%.2f" % commandeGauche) + "," + ("%.3f" % omega) + "," + ("%.2f" % omegaDroit) + "," + ("%.2f" % omegaGauche) + "," + ("%.3f" % thetames) + "," + ("%.2f" % x1) + "," + ("%.2f" % x2) + "," + ("%.2f" % vxmes) + "," + ("%.2f" % (180 * xidotmes/3.141592))})
+        aEnvoyer = json.dumps({ 'Temps':("%.2f" % tcourant), \
+                                'commandeDroit':("%.2f" % commandeDroit), \
+                                'commandeGauche':("%.2f" % commandeGauche), \
+                                'omega':("%.3f" % omega), \
+                                'omegaDroit':("%.2f" % omegaDroit), \
+                                'omegaGauche':("%.2f" % omegaGauche), \
+                                'thetames':("%.3f" % thetames), \
+                                'Consigne vitesse longitudinale':("%.2f" % x1), \
+                                'Consigne vitesse de rotation':("%.2f" % x2), \
+                                'Vitesse longitudinale':("%.2f" % vxmes), \
+                                'Vitesse de rotation':("%.2f" % (180 * ximes/3.141592)), \
+                                'Raw':("%.2f" % tcourant) + "," + \
+                                ("%.2f" % commandeDroit) + "," + \
+                                ("%.2f" % commandeGauche) + "," + \
+                                ("%.3f" % omega) + "," + \
+                                ("%.2f" % omegaDroit) + "," + \
+                                ("%.2f" % omegaGauche) + "," + \
+                                ("%.3f" % thetames) + "," + \
+                                ("%.2f" % x1) + "," + \
+                                ("%.2f" % x2) + "," + \
+                                ("%.2f" % vxmes) + "," + \
+                                ("%.2f" % (180 * ximes/3.141592))})
         if socketOK:
             try:
                 self.write_message(aEnvoyer)
@@ -462,31 +537,50 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 #--- obligatoire pour lancement du code -- 
 if __name__=="__main__": # pour rendre le code executable 
-    started = False
-    startedDroit = False
-    startedGauche = False
-    setup() # appelle la fonction setup
-    print "Setup done."
-    
-    th = threading.Thread(None, emitData, None, (), {})
-    th.daemon = True
-    th.start()
-    
-    print "Starting Tornado."
-    try:
-        print "Connect to ws://" + get_ip_address('eth0') + ":9090/ws with Ethernet."
-    except:
-        pass
+
+    # Test pour savoir si le firmware est présent sur la carte A-Star
+    firmwarePresent = False
+    for i in range(1, 11):
+        time.sleep(0.1)
+        print "Test presence du firmware de la carte A-Star, tentative " + str(i) + " / 10"
+        try:
+            firmwarePresent = a_star.firmwareOK()
+            if firmwarePresent:
+                break
+        except:
+            print "Firmware absent"
+            
+    if firmwarePresent:
+        print "Firmware present, on continue..."
+        started = False
+        startedDroit = False
+        startedGauche = False
+        setup() # appelle la fonction setup
+        print "Setup done."
         
-    try:
-        print "Connect to ws://" + get_ip_address('wlan0') + ":9090/ws with Wifi."
-    except:
-        pass
+        th = threading.Thread(None, emitData, None, (), {})
+        th.daemon = True
+        th.start()
         
-    socketOK = False
-    startTornado()
+        print "Starting Tornado."
+        try:
+            print "Connect to ws://" + get_ip_address('eth0') + ":9090/ws with Ethernet."
+        except:
+            pass
+            
+        try:
+            print "Connect to ws://" + get_ip_address('wlan0') + ":9090/ws with Wifi."
+        except:
+            pass
+        socketOK = False
+        startTornado()
+    else:
+        print "Firmware absent, on abandonne ce programme."
+        print "Veuillez charger le firmware sur la carte A-Star pour exécuter ce programme."
+
 
 

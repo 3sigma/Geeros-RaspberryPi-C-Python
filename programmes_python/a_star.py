@@ -62,3 +62,11 @@ class AStar(object):
 
   def servo(self, angle):
     self.command(9, map(ord, list(struct.pack('h', angle))))
+
+  def firmwareOK(self):
+    self.command(10, [])
+    if self.read_unpack("H")[0] == 1:
+      return True
+    else:
+      return False
+
