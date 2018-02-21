@@ -47,11 +47,13 @@
 			"width": 1,
 			"row": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col_width": 1,
 			"widgets": [
@@ -103,7 +105,9 @@
 						"title": "Type de signal (carré ou sinus)",
 						"variable": "datasources[\"ws\"][\"typeSignal\"]",
 						"yestext": "Sinus",
+						"yesvalue": "1",
 						"notext": "Carré",
+						"novalue": "0",
 						"initialstate": false
 					}
 				},
@@ -152,40 +156,16 @@
 			]
 		},
 		{
-			"title": "Moniteur",
-			"width": 1,
-			"row": {
-				"3": 11,
-				"4": 23
-			},
-			"col": {
-				"3": 2,
-				"4": 1
-			},
-			"col_width": "1",
-			"widgets": [
-				{
-					"type": "textarea",
-					"settings": {
-						"nblines_window": "5",
-						"value": [
-							"datasources[\"ws\"][\"Raw\"]"
-						]
-					}
-				}
-			]
-		},
-		{
 			"title": "Vitesse moteurs",
 			"width": 1,
 			"row": {
 				"3": 11,
-				"4": 9,
+				"4": 11,
 				"5": 9
 			},
 			"col": {
 				"3": 3,
-				"4": 4,
+				"4": 3,
 				"5": 3
 			},
 			"col_width": 1,
@@ -217,11 +197,13 @@
 			"width": 1,
 			"row": {
 				"3": 17,
-				"4": 17
+				"4": 11,
+				"5": 17
 			},
 			"col": {
 				"3": 3,
-				"4": 3
+				"4": 4,
+				"5": 3
 			},
 			"col_width": 1,
 			"widgets": [
@@ -235,6 +217,32 @@
 					}
 				}
 			]
+		},
+		{
+			"title": "Moniteur",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 5,
+				"5": 23
+			},
+			"col": {
+				"3": 2,
+				"4": 1,
+				"5": 1
+			},
+			"col_width": "1",
+			"widgets": [
+				{
+					"type": "textarea",
+					"settings": {
+						"nblines_window": "5",
+						"value": [
+							"datasources[\"ws\"][\"Raw\"]"
+						]
+					}
+				}
+			]
 		}
 	],
 	"datasources": [
@@ -244,11 +252,10 @@
 			"settings": {
 				"host": "ws://192.168.0.199:9090/ws",
 				"variables_to_send": "typeSignal,offset,amplitude,frequence,moteurint",
-				"refresh_rate": 500,
-				"checksum": "none",
-				"name": "ws"
+				"refresh_rate": "100",
+				"checksum": "none"
 			}
 		}
 	],
-	"columns": 3
+	"columns": 4
 }

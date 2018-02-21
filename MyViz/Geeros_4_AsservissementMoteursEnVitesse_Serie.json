@@ -51,11 +51,13 @@
 			"width": 1,
 			"row": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col_width": 1,
 			"widgets": [
@@ -100,7 +102,9 @@
 						"title": "Type de signal (carré ou sinus)",
 						"variable": "datasources[\"sp\"][\"typeSignal\"]",
 						"yestext": "Sinus",
+						"yesvalue": "1",
 						"notext": "Carré",
+						"novalue": "0",
 						"initialstate": false
 					}
 				},
@@ -149,52 +153,17 @@
 			]
 		},
 		{
-			"title": "Vitesses",
-			"width": 1,
-			"row": {
-				"3": 11,
-				"4": 9,
-				"5": 9
-			},
-			"col": {
-				"3": 3,
-				"4": 4,
-				"5": 3
-			},
-			"col_width": 1,
-			"widgets": [
-				{
-					"type": "text_widget",
-					"settings": {
-						"title": "Moteur droit",
-						"size": "regular",
-						"value": "datasources[\"sp\"][\"VitesseDroit\"]",
-						"animate": false,
-						"units": "rad/s"
-					}
-				},
-				{
-					"type": "text_widget",
-					"settings": {
-						"title": "Moteur gauche",
-						"size": "regular",
-						"value": "datasources[\"sp\"][\"VitesseGauche\"]",
-						"animate": false,
-						"units": "rad/s"
-					}
-				}
-			]
-		},
-		{
 			"title": "Gains du PID",
 			"width": 1,
 			"row": {
 				"3": 11,
-				"4": 11
+				"4": 5,
+				"5": 11
 			},
 			"col": {
 				"3": 2,
-				"4": 2
+				"4": 1,
+				"5": 2
 			},
 			"col_width": 1,
 			"widgets": [
@@ -243,25 +212,38 @@
 			]
 		},
 		{
-			"title": "Moniteur",
+			"title": "Vitesses",
 			"width": 1,
 			"row": {
-				"3": 17,
-				"4": 23
+				"3": 11,
+				"4": 11,
+				"5": 9
 			},
 			"col": {
 				"3": 3,
-				"4": 1
+				"4": 3,
+				"5": 3
 			},
-			"col_width": "1",
+			"col_width": 1,
 			"widgets": [
 				{
-					"type": "textarea",
+					"type": "text_widget",
 					"settings": {
-						"nblines_window": "5",
-						"value": [
-							"datasources[\"sp\"][\"_rawdata\"]"
-						]
+						"title": "Moteur droit",
+						"size": "regular",
+						"value": "datasources[\"sp\"][\"VitesseDroit\"]",
+						"animate": false,
+						"units": "rad/s"
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Moteur gauche",
+						"size": "regular",
+						"value": "datasources[\"sp\"][\"VitesseGauche\"]",
+						"animate": false,
+						"units": "rad/s"
 					}
 				}
 			]
@@ -271,11 +253,13 @@
 			"width": 1,
 			"row": {
 				"3": 23,
-				"4": 23
+				"4": 11,
+				"5": 23
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 4,
+				"5": 1
 			},
 			"col_width": 1,
 			"widgets": [
@@ -289,6 +273,32 @@
 					}
 				}
 			]
+		},
+		{
+			"title": "Moniteur",
+			"width": 1,
+			"row": {
+				"3": 17,
+				"4": 19,
+				"5": 23
+			},
+			"col": {
+				"3": 3,
+				"4": 1,
+				"5": 1
+			},
+			"col_width": "2",
+			"widgets": [
+				{
+					"type": "textarea",
+					"settings": {
+						"nblines_window": "5",
+						"value": [
+							"datasources[\"sp\"][\"_rawdata\"]"
+						]
+					}
+				}
+			]
 		}
 	],
 	"datasources": [
@@ -296,17 +306,16 @@
 			"name": "sp",
 			"type": "serialport",
 			"settings": {
-				"port": "COM26",
+				"port": "COM9",
 				"baudrate": 115200,
 				"variables_to_read": "Temps,TCopie,Consigne,VitesseDroit,VitesseGauche,CommandeDroit,CommandeGauche,TensionAlim",
 				"variables_to_send": "typeSignal,offset,amplitude,frequence,Kp,Ki,Kd,moteurint",
-				"refresh_rate": 500,
+				"refresh_rate": 100,
 				"separator": ",",
 				"checksum": "sum",
-				"immediate_startup": false,
-				"name": "sp"
+				"immediate_startup": false
 			}
 		}
 	],
-	"columns": 3
+	"columns": 4
 }

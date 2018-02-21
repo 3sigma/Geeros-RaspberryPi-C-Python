@@ -15,7 +15,7 @@
 			"col": {
 				"2": 2,
 				"3": 2,
-				"4": 3,
+				"4": 2,
 				"5": 3
 			},
 			"col_width": "2",
@@ -32,11 +32,14 @@
 							"datasources[\"ws\"][\"Vitesse longitudinale\"]"
 						],
 						"y_axis_min_range": "-0.2,0.2",
+						"offset_y": "0",
 						"y2_axis_min_range": "-10,10",
+						"offset_y2": "0",
 						"include_legend": true,
 						"legendStr": "vxref,vxmes",
 						"height": 4,
-						"pausable": true
+						"pausable": true,
+						"refreshperiod": 50
 					}
 				},
 				{
@@ -51,11 +54,14 @@
 							"datasources[\"ws\"][\"Vitesse de rotation\"]"
 						],
 						"y_axis_min_range": "-0.1,0.1",
+						"offset_y": "0",
 						"y2_axis_min_range": "-10,10",
+						"offset_y2": "0",
 						"include_legend": true,
 						"legendStr": "xiref,ximes",
 						"height": 4,
-						"pausable": true
+						"pausable": true,
+						"refreshperiod": 50
 					}
 				},
 				{
@@ -69,14 +75,17 @@
 							"datasources[\"ws\"][\"thetames\"]"
 						],
 						"y_axis_min_range": "-0.1,0.1",
+						"offset_y": "0",
 						"y2value": [
 							"datasources[\"ws\"][\"omega\"]"
 						],
 						"y2_axis_min_range": "-1,1",
+						"offset_y2": "0",
 						"include_legend": true,
 						"legendStr": "theta (rad),omega (rad/s)",
 						"height": 4,
-						"pausable": true
+						"pausable": true,
+						"refreshperiod": 50
 					}
 				}
 			]
@@ -86,11 +95,13 @@
 			"width": 1,
 			"row": {
 				"3": 1,
-				"4": 9
+				"4": 1,
+				"5": 9
 			},
 			"col": {
 				"3": 1,
-				"4": 2
+				"4": 1,
+				"5": 2
 			},
 			"col_width": 1,
 			"widgets": [
@@ -117,11 +128,13 @@
 			"width": 1,
 			"row": {
 				"3": 5,
-				"4": 1
+				"4": 5,
+				"5": 1
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col_width": 1,
 			"widgets": [
@@ -142,11 +155,13 @@
 			"width": 1,
 			"row": {
 				"3": 15,
-				"4": 15
+				"4": 15,
+				"5": 15
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col_width": 1,
 			"widgets": [
@@ -171,11 +186,13 @@
 			"width": 1,
 			"row": {
 				"3": 21,
-				"4": 23
+				"4": 21,
+				"5": 23
 			},
 			"col": {
 				"3": 1,
-				"4": 1
+				"4": 1,
+				"5": 1
 			},
 			"col_width": "1",
 			"widgets": [
@@ -198,10 +215,10 @@
 			"settings": {
 				"host": "ws://192.168.0.199:9090/ws",
 				"variables_to_send": "vref,xiref,servoref",
-				"refresh_rate": "500",
+				"refresh_rate": "100",
 				"checksum": "none"
 			}
 		}
 	],
-	"columns": 3
+	"columns": 4
 }
