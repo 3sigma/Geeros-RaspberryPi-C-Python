@@ -7,7 +7,7 @@
 # http://boutique.3sigma.fr/12-robots
 #
 # Auteur: 3Sigma
-# Version 3.0 - 01/11/2017
+# Version 3.1 - 20/02/2018
 ##################################################################################
 
 # Import WiringPi2
@@ -128,14 +128,22 @@ def CalculVitesse():
     # Mesure de la vitesse des moteurs grâce aux codeurs incrémentaux
     try:
         codeurDroitDeltaPos = a_star.read_codeurDroitDeltaPos()
-        codeurDroitDeltaPosPrec = codeurDroitDeltaPos
+        if abs(codeurDroitDeltaPos) > 1000:
+            #print "Values out of range"
+            codeurDroitDeltaPos = codeurDroitDeltaPosPrec
+        else:
+            codeurDroitDeltaPosPrec = codeurDroitDeltaPos
     except:
         #print "Erreur lecture codeur droit"
         codeurDroitDeltaPos = codeurDroitDeltaPosPrec
-    
+
     try:
         codeurGaucheDeltaPos = a_star.read_codeurGaucheDeltaPos()
-        codeurGaucheDeltaPosPrec = codeurGaucheDeltaPos
+        if abs(codeurGaucheDeltaPos) > 1000:
+            #print "Values out of range"
+            codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
+        else:
+            codeurGaucheDeltaPosPrec = codeurGaucheDeltaPos
     except:
         #print "Erreur lecture codeur gauche"
         codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
@@ -155,7 +163,7 @@ def CalculVitesse():
             vref = offset + amplitude
     else: # sinus
         if frequence > 0:
-            vref = offset + amplitude * sin(2*3.141592*frequence*tcourant)
+            vref = offset + amplitude * math.sin(2*3.141592*frequence*tcourant)
         else:
             vref = offset + amplitude
 

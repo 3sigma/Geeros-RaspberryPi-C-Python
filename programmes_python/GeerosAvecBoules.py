@@ -7,7 +7,7 @@
 # http://boutique.3sigma.fr/12-robots
 #
 # Auteur: 3Sigma
-# Version 3.0 - 01/11/2017
+# Version 3.1 - 20/02/2018
 ##################################################################################
 
 # Import WiringPi2
@@ -50,6 +50,7 @@ omegaDroit = 0
 omegaGauche = 0
 
 
+
 # Les moteurs sont asservis en vitesse grâce à un régulateur de type PID
 # On déclare ci-dessous les variables et paramètres nécessaires à l'asservissement et au régulateur
 R = 0.045 # Rayon d'une roue
@@ -80,7 +81,6 @@ commandeGauche = 0. # commande en tension calculée par le PID pour le moteur ga
 yprecvx = 0. # Mesure de la vitesse longitudinale au calcul précédent
 yprecxi = 0. # Mesure de la vitesse de rotation au calcul précédent
 
-
 # Variables intermédiaires
 Ti = 0.
 ad = 0.
@@ -89,7 +89,6 @@ bd = 0.
 # Variables utilisées pour les données reçues
 x1 = 0.
 x2 = 0.
-servoref = 45.
 Kp2 = 1.
 Ki2 = 1.
 Kd2 = 1.
@@ -100,6 +99,7 @@ Kdxi2 = 1.
 # Déclarations pour les consignes de mouvement
 vxref = 0.
 xiref = 0.
+
 
 # Time out de réception des données
 timeout = 2
@@ -128,6 +128,9 @@ def setup():
 
     CommandeMoteurs(0, 0, tensionAlim)
     
+    # Initialisation de la position du servo
+    a_star.servo(45)
+    
     # Mesure de la tension d'alimentation
     try:
         tensionAlimBrute = a_star.read_battery_millivolts()
@@ -151,13 +154,12 @@ def loop():
 
 
 def CalculVitesse():
-    global ticksCodeurDroit, ticksCodeurGauche, indiceTicksCodeurDroit, indiceTicksCodeurGauche, started, \
-        omegaDroit, omegaGauche, ticksCodeurDroitTab, ticksCodeurGaucheTab, codeurDroitDeltaPosPrec, codeurGaucheDeltaPosPrec, \
+    global started, \
+        omegaDroit, omegaGauche, codeurDroitDeltaPosPrec, codeurGaucheDeltaPosPrec, \
         ad, P_vx, I_vx, D_vx, P_xi, I_xi, D_xi, bd, Ti, yprecvx, yprecxi, timeLastReceived, timeout, \
         codeurDroitDeltaPos, codeurGaucheDeltaPos, commandeDroit, commandeGauche, vxmes, ximes, vxref, xiref, dt2, tprec, \
         idecimLectureTension, decimLectureTension, tensionAlim, x1, x2
         
-    debut = time.time()
     
     # Mesure de la vitesse des moteurs grâce aux codeurs incrémentaux
     try:
@@ -181,12 +183,12 @@ def CalculVitesse():
     except:
         #print "Erreur lecture codeur gauche"
         codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
-
+    
     # C'est bien dt qu'on utilise ici et non pas dt2 (voir plus loin l'explication de dt2)
     # car codeurDroitDeltaPos et codeurGaucheDeltaPos sont mesurés en temps-réel par l'A*
     omegaDroit = -2 * ((2 * 3.141592 * codeurDroitDeltaPos) / 1632) / (Nmoy * dt)  # en rad/s
     omegaGauche = 2 * ((2 * 3.141592 * codeurGaucheDeltaPos) / 1632) / (Nmoy * dt)  # en rad/s
-    
+
     # Si on n'a pas reçu de données depuis un certain temps, celles-ci sont annulées
     if (time.time()-timeLastReceived) > timeout:
         x1 = 0.
@@ -205,7 +207,7 @@ def CalculVitesse():
     # dt2 peut être jusqu'à deux fois plus petit que dt)
     dt2 = time.time() - tprec
     tprec = time.time()
-        
+
     # Calcul du PID sur vx
     # Paramètres intermédiaires
     Ti = Ki2 * Kivx/(Kp2 * Kpvx + 0.01)
@@ -274,6 +276,7 @@ def CalculVitesse():
     else:
         idecimLectureTension = idecimLectureTension + 1
 
+        
     
 
     
@@ -329,6 +332,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     
     def on_message(self, message):
         global x1, x2, Kp2, Ki2, Kd2, Kpxi2, Kixi2, Kdxi2, timeLastReceived, socketOK
+
         jsonMessage = json.loads(message)
         
         # Annulation du timeout de réception des données
@@ -342,7 +346,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             #print ("x2: %.2f" % x2)
         if jsonMessage.get('servoref') != None:
             servoref = int(jsonMessage.get('servoref'))
-            a_star.servo(servoref)
+            try:
+                a_star.servo(servoref)
+            except:
+                pass
             #print ("servoref: %d" % servoref)
         if jsonMessage.get('Kp2ref') != None:
             Kp2 = float(jsonMessage.get('Kp2ref'))
@@ -378,11 +385,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def sendToSocket(self):
         global started, codeurDroitDeltaPos, codeurGaucheDeltaPos, socketOK, commandeDroit, commandeGauche, vxref, xiref, \
                 vxmes, ximes, T0
-        
+
         tcourant = time.time() - T0
         aEnvoyer = json.dumps( {'Temps':("%.2f" % tcourant),
                                 'Consigne vitesse longitudinale':("%.2f" % x1),
-                                'Consigne vitesse de rotation':("%.2f" % x2),
+                                'Consigne vitesse de rotation':("%.2f" % (180 * x2/3.141592)),
                                 'Vitesse longitudinale':("%.2f" % vxmes),
                                 'Vitesse de rotation':("%.2f" % (180 * ximes/3.141592)),
                                 'omegaDroit':("%.2f" % omegaDroit),
@@ -440,6 +447,12 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
+# Gestion des segmentation fault
+def signal_handler2(signal, frame):
+    print 'Received signal ' + str(sig) + ' on line ' + str(frame.f_lineno) + ' in ' + frame.f_code.co_filename
+
+signal.signal(signal.SIGSEGV, signal_handler2)
+
 #--- obligatoire pour lancement du code -- 
 if __name__=="__main__": # pour rendre le code executable 
 
@@ -454,7 +467,7 @@ if __name__=="__main__": # pour rendre le code executable
                 break
         except:
             print "Firmware absent"
-            
+        
     if firmwarePresent:
         print "Firmware present, on continue..."
         started = False
@@ -477,6 +490,7 @@ if __name__=="__main__": # pour rendre le code executable
             print "Connect to ws://" + get_ip_address('wlan0') + ":9090/ws with Wifi."
         except:
             pass
+            
         socketOK = False
         startTornado()
     else:

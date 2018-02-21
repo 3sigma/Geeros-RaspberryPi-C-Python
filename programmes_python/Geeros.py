@@ -6,7 +6,7 @@
 # http://boutique.3sigma.fr/12-robots
 #
 # Auteur: 3Sigma
-# Version 3.0 - 01/10/2017
+# Version 3.1 - 20/02/2018
 ##################################################################################
 
 # Import WiringPi2
@@ -62,34 +62,31 @@ umin = -6. # valeur min (ou max en négatif) de la tension de commande du moteur
 vxmes = 0. # vitesse longitudinale mesurée
 ximes = 0. # vitesse de rotation mesurée
 Tf = 0.02 # constante de temps de filtrage de l'action dérivée du PID
-Kpvx1 = -18.2 # sous-gain proportionnel pour l'asservissement de vitesse longitudinale
-Kpvx2 = 0.132 # sous-gain proportionnel pour l'asservissement de vitesse longitudinale
+Kpvx = -15.3 # gain proportionnel pour l'asservissement de vitesse longitudinale
 Kivx = -6.8 # gain intégral pour l'asservissement de vitesse longitudinale
 Kpomega = -1.87 # gain proportionnel pour l'asservissement de verticalité
 Kiomega = -23.3 # gain intégral pour l'asservissement de verticalité
-Kpxidot = 0. # gain proportionnel pour l'asservissement de rotation
-Kixidot = 2.14 # gain intégral pour l'asservissement de rotation
+Kpxi = 0. # gain proportionnel pour l'asservissement de rotation
+Kixi = 2.14 # gain intégral pour l'asservissement de rotation
 commande_vx = 0. # commande pour l'asservissement de vitesse longitudinale
 commande_omega = 0. # commande pour l'asservissement de verticalité
-commande_xidot = 0. # commande pour l'asservissement de rotation
+commande_xi = 0. # commande pour l'asservissement de rotation
 P_vx = 0. # action proportionnelle pour l'asservissement de vitesse longitudinale
 I_vx = 0. # action intégrale pour l'asservissement de vitesse longitudinale
 P_omega = 0. # action proportionnelle pour l'asservissement de verticalité
 I_omega = 0. # action intégrale pour l'asservissement de verticalité
-P_xidot = 0. # action proportionnelle pour l'asservissement de rotation
-I_xidot = 0. # action intégrale pour l'asservissement de rotation
+P_xi = 0. # action proportionnelle pour l'asservissement de rotation
+I_xi = 0. # action intégrale pour l'asservissement de rotation
 thetaest = 0. # angle d'inclinaison estimé par le filtre complémentaire
 tau = 1. # paramètre du filtre complémentaire
-
 commandeDroit = 0. # commande en tension calculée par le PID pour le moteur droit
 commandeGauche = 0. # commande en tension calculée par le PID pour le moteur gauche
-
 
 # Variables utilisées pour les données reçues
 x1 = 0.
 x2 = 0.
-Kp2 = 1.0
-Ki2 = 1.0
+Kp2 = 1.
+Ki2 = 1.
 Kpxi2 = 1.
 Kixi2 = 1.
 
@@ -148,6 +145,9 @@ def setup():
   
     CommandeMoteurs(0, 0, tensionAlim)
     
+    # Initialisation de la position du servo
+    a_star.servo(45)
+    
     # Mesure de la tension d'alimentation
     try:
         tensionAlimBrute = a_star.read_battery_millivolts()
@@ -171,18 +171,18 @@ def loop():
 
 
 def CalculVitesse():
-    global ticksCodeurDroit, ticksCodeurGauche, indiceTicksCodeurDroit, indiceTicksCodeurGauche, started, omega, thetames, \
-        omegaDroit, omegaGauche, ticksCodeurDroitTab, ticksCodeurGaucheTab, thetamesprec, omegaprec, codeurDroitDeltaPosPrec, codeurGaucheDeltaPosPrec, \
-        P_vx, I_vx, P_xidot, I_xidot, imu, thetaest, tau, omegaref, thetaref, timeLastReceived, timeout, \
+    global started, omega, thetames, \
+        omegaDroit, omegaGauche, thetamesprec, omegaprec, codeurDroitDeltaPosPrec, codeurGaucheDeltaPosPrec, \
+        P_vx, I_vx, P_xi, I_xi, imu, thetaest, tau, omegaref, thetaref, timeLastReceived, timeout, \
         codeurDroitDeltaPos, codeurGaucheDeltaPos, commandeDroit, commandeGauche, vxmes, ximes, vxref, xiref, juststarted, \
-        startedGeeros, signe_ax, x1, x2, dt2, tprec, commandeDroitPrec, commandeGauchePrec, \
+        startedGeeros, signe_ax, x1, x2, dt2, tprec, \
         idecimLectureTension, decimLectureTension, tensionAlim
-        
-    debut = time.time()
     
     # Tant que l'asservissement de verticalité n'est pas activé
     while not startedGeeros:
 
+        time.sleep(0.005)
+        
         tprec = time.time() - dt
                 
         # Geeros vient de chuter
@@ -194,7 +194,7 @@ def CalculVitesse():
             # Réinitilisation de l'asservissement
             I_vx = 0.
             I_omega = 0.
-            I_xidot = 0.
+            I_xi = 0.
             thetaest = 0.
 
         # Mesure de la pesanteur
@@ -216,7 +216,7 @@ def CalculVitesse():
             # On garde tout à zéro
             I_vx = 0.
             I_omega = 0.
-            I_xidot = 0.
+            I_xi = 0.
             thetaest = 0.
 
     # Mesure de la vitesse des moteurs grâce aux codeurs incrémentaux
@@ -241,7 +241,7 @@ def CalculVitesse():
     except:
         #print "Erreur lecture codeur gauche"
         codeurGaucheDeltaPos = codeurGaucheDeltaPosPrec
-
+    
     # C'est bien dt qu'on utilise ici et non pas dt2 (voir plus loin l'explication de dt2)
     # car codeurDroitDeltaPos et codeurGaucheDeltaPos sont mesurés en temps-réel par l'A*
     omegaDroit = -2 * ((2 * 3.141592 * codeurDroitDeltaPos) / 1632) / (Nmoy * dt)  # en rad/s
@@ -313,12 +313,10 @@ def CalculVitesse():
     omegames = omega * en
     ximes = -(omegaDroit - omegaGauche)*R/W * en
 
-    # Calcul du PI sur vx
-    Kpvx = (Kpvx1 + Kpvx2/R) * Kp2
-    
+    # Calcul du PI sur vx    
     # Terme proportionnel (la transformation de la commande par retour d'état en PI
     # conduit à une référence nulle, d'où le 0.*vxref)
-    P_vx = Kpvx * (0. * vxref - vxmes)
+    P_vx = Kpvx * Kp2 * (0. * vxref - vxmes)
 
     # Calcul de la commande
     commande_vx = P_vx + I_vx
@@ -341,24 +339,23 @@ def CalculVitesse():
 
     # Fin Calcul du PI sur omega
 
-    # Calcul du PI sur xidot
+    # Calcul du PI sur xi
     
     # Terme proportionnel
-    P_xidot = Kpxidot * (xiref - ximes)
+    P_xi = Kpxi * Kpxi2 * (xiref - ximes)
 
     # Calcul de la commande
-    commande_xidot = P_xidot + I_xidot
-
+    commande_xi = P_xi + I_xi
 
     # Terme intégral (sera utilisé lors du pas d'échantillonnage suivant)
-    I_xidot = I_xidot + Kixidot * Kixi2 * dt2 * (xiref - ximes)
+    I_xi = I_xi + Kixi * Kixi2 * dt2 * (xiref - ximes)
 
-    # Fin Calcul du PI sur xidot
+    # Fin Calcul du PI sur xi
 
 
     # Calcul des commandes des moteurs
-    commandeDroit = (commande_vx + commande_omega - commande_xidot) * en
-    commandeGauche = (commande_vx + commande_omega + commande_xidot) * en
+    commandeDroit = (commande_vx + commande_omega - commande_xi) * en
+    commandeGauche = (commande_vx + commande_omega + commande_xi) * en
       
     CommandeMoteurs(commandeDroit, commandeGauche, tensionAlim)
     
@@ -375,6 +372,7 @@ def CalculVitesse():
     else:
         idecimLectureTension = idecimLectureTension + 1
 
+        
     
 
     
@@ -430,6 +428,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     
     def on_message(self, message):
         global x1, x2, Kp2, Ki2, Kpxi2, Kixi2, timeLastReceived, socketOK
+
         jsonMessage = json.loads(message)
         
         # Annulation du timeout de réception des données
@@ -443,7 +442,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             #print ("x2: %.2f" % x2)
         if jsonMessage.get('servoref') != None:
             servoref = int(jsonMessage.get('servoref'))
-            a_star.servo(servoref)
+            try:
+                a_star.servo(servoref)
+            except:
+                pass
             #print ("servoref: %d" % servoref)
         if jsonMessage.get('Kp2ref') != None:
             Kp2 = float(jsonMessage.get('Kp2ref'))
@@ -472,7 +474,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def sendToSocket(self):
         global started, codeurDroitDeltaPos, codeurGaucheDeltaPos, socketOK, commandeDroit, commandeGauche, vxref, xiref, \
-                vxmes, ximes, omega, thetames, T0
+                vxmes, ximes, omega, thetames, T0, x1, x2
         
         tcourant = time.time() - T0
         aEnvoyer = json.dumps({ 'Temps':("%.2f" % tcourant), \
@@ -483,7 +485,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                                 'omegaGauche':("%.2f" % omegaGauche), \
                                 'thetames':("%.3f" % thetames), \
                                 'Consigne vitesse longitudinale':("%.2f" % x1), \
-                                'Consigne vitesse de rotation':("%.2f" % x2), \
+                                'Consigne vitesse de rotation':("%.2f" % (180 * x2/3.141592)), \
                                 'Vitesse longitudinale':("%.2f" % vxmes), \
                                 'Vitesse de rotation':("%.2f" % (180 * ximes/3.141592)), \
                                 'Raw':("%.2f" % tcourant) + "," + \
@@ -539,6 +541,12 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
+# Gestion des segmentation fault
+def signal_handler2(signal, frame):
+    print 'Received signal ' + str(sig) + ' on line ' + str(frame.f_lineno) + ' in ' + frame.f_code.co_filename
+
+signal.signal(signal.SIGSEGV, signal_handler2)
+
 #--- obligatoire pour lancement du code -- 
 if __name__=="__main__": # pour rendre le code executable 
 
@@ -553,7 +561,7 @@ if __name__=="__main__": # pour rendre le code executable
                 break
         except:
             print "Firmware absent"
-            
+        
     if firmwarePresent:
         print "Firmware present, on continue..."
         started = False
@@ -576,6 +584,7 @@ if __name__=="__main__": # pour rendre le code executable
             print "Connect to ws://" + get_ip_address('wlan0') + ":9090/ws with Wifi."
         except:
             pass
+            
         socketOK = False
         startTornado()
     else:
