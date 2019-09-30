@@ -122,7 +122,7 @@ def CalculVitesse():
         codeurDroitDeltaPos, codeurGaucheDeltaPos, commandeDroit, commandeGauche, vrefDroit, vrefGauche, \
         codeurGaucheDeltaPosPrec, codeurDroitDeltaPosPrec, \
         typeSignal, offset, amplitude, frequence, moteurint, \
-        idecimLectureTension, decimLectureTension, tensionAlim
+        idecimLectureTension, decimLectureTension, tensionAlim, vref
     
     debut = time.time()
     # Mesure de la vitesse des moteurs grâce aux codeurs incrémentaux
@@ -309,7 +309,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         vrefGauche = 0.
 
     def sendToSocket(self):
-        global codeurDroitDeltaPos, codeurGaucheDeltaPos, socketOK, commandeDroit, commandeGauche, tensionAlim
+        global omegaDroit, omegaGauche, socketOK, tensionAlim, vref
         
         tcourant = time.time() - T0
         aEnvoyer = json.dumps({ 'Temps':("%.2f" % tcourant), \
