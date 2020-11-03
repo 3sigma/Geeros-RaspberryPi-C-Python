@@ -375,14 +375,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                                 'omegaGauche':("%.2f" % omegaGauche), \
                                 'commandeDroit':("%.2f" % commandeDroit), \
                                 'commandeGauche':("%.2f" % commandeGauche), \
-                                'tensionAlim':("%.2f" % tensionAlim), \
-                                'Raw':("%.2f" % tcourant) + "," +  \
-                                ("%.2f" % vref) + "," +  \
-                                ("%.2f" % omegaDroit) + "," +  \
-                                ("%.2f" % omegaGauche) + "," +  \
-                                ("%.2f" % commandeDroit) + "," +  \
-                                ("%.2f" % commandeGauche) + "," + \
-                                ("%.2f" % tensionAlim)})
+                                'tensionAlim':("%.2f" % tensionAlim)})
         if socketOK:
             try:
                 self.write_message(aEnvoyer)

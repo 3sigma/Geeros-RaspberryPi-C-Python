@@ -395,16 +395,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                                 'omegaDroit':("%.2f" % omegaDroit),
                                 'omegaGauche':("%.2f" % omegaGauche),
                                 'commandeDroit':("%.2f" % commandeDroit),
-                                'commandeGauche':("%.2f" % commandeGauche),
-                                'Raw':("%.2f" % tcourant) + "," +
-                                ("%.2f" % x1) + "," +
-                                ("%.2f" % x2) + "," +
-                                ("%.2f" % vxmes) + "," +
-                                ("%.2f" % (180 * ximes/3.141592)) + "," +
-                                ("%.2f" % omegaDroit) + "," +
-                                ("%.2f" % omegaGauche) + "," +
-                                ("%.2f" % commandeDroit) + "," +
-                                ("%.2f" % commandeGauche)})
+                                'commandeGauche':("%.2f" % commandeGauche)})
         if socketOK:
             try:
                 self.write_message(aEnvoyer)

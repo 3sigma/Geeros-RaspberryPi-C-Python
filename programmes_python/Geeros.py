@@ -487,18 +487,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                                 'Consigne vitesse longitudinale':("%.2f" % x1), \
                                 'Consigne vitesse de rotation':("%.2f" % (180 * x2/3.141592)), \
                                 'Vitesse longitudinale':("%.2f" % vxmes), \
-                                'Vitesse de rotation':("%.2f" % (180 * ximes/3.141592)), \
-                                'Raw':("%.2f" % tcourant) + "," + \
-                                ("%.2f" % commandeDroit) + "," + \
-                                ("%.2f" % commandeGauche) + "," + \
-                                ("%.3f" % omega) + "," + \
-                                ("%.2f" % omegaDroit) + "," + \
-                                ("%.2f" % omegaGauche) + "," + \
-                                ("%.3f" % thetames) + "," + \
-                                ("%.2f" % x1) + "," + \
-                                ("%.2f" % x2) + "," + \
-                                ("%.2f" % vxmes) + "," + \
-                                ("%.2f" % (180 * ximes/3.141592))})
+                                'Vitesse de rotation':("%.2f" % (180 * ximes/3.141592))})
         if socketOK:
             try:
                 self.write_message(aEnvoyer)
