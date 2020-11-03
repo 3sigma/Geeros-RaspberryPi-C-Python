@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": "0.10.12",
 	"allow_edit": true,
 	"plugins": [],
 	"panes": [
@@ -33,11 +33,16 @@
 							"datasources[\"ws\"][\"omegaGauche\"]"
 						],
 						"y_axis_min_range": "-1,1",
+						"offset_y": "0",
 						"y2_axis_min_range": "-10,10",
+						"offset_y2": "0",
 						"include_legend": true,
 						"legendStr": "Tension (V),Vitesse mot. droit (rad/s), Vitesse mot. gauche (rad/s)",
-						"height": 4,
-						"pausable": true
+						"height": 5,
+						"pausable": true,
+						"legendoutside": false,
+						"numberofcolumns": 2,
+						"refreshperiod": 50
 					}
 				}
 			]
@@ -62,6 +67,7 @@
 					"settings": {
 						"title": "Marche / Arrêt de l'application",
 						"style": "switch",
+						"useinputip": false,
 						"host": "192.168.0.199",
 						"login": "root",
 						"password": "raspberrypi",
@@ -69,8 +75,81 @@
 						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
 						"ontext": "ON",
 						"offtext": "OFF",
+						"appendip": false,
+						"stop_when_exit": true,
 						"initialstate": false,
-						"caption": "Switch ON"
+						"variable": [
+							"datasources[\"loc\"][\"onoff\"]"
+						],
+						"onvalue": "1",
+						"offvalue": "0",
+						"caption": "Switch ON",
+						"deactivation_delay_on_stop": "0",
+						"refresh_iframes": false
+					}
+				},
+				{
+					"type": "plotexplore",
+					"settings": {
+						"title": "Résultats",
+						"type1": "save",
+						"useplotdata1": false,
+						"explore_with_qats1": false,
+						"disablereset1": "datasources[\"loc\"][\"onoff\"]",
+						"value1": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"Consigne\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"TensionAlim\"]"
+						],
+						"legends1": "Temps (s),Consigne (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Tension batterie (V)",
+						"caption1": "Enregistrer",
+						"numberoflegendcolumns1": 2,
+						"disable_variable1": "",
+						"re_enable_variable1": "",
+						"type2": "plot",
+						"useplotdata2": false,
+						"explore_with_qats2": true,
+						"text_compare2": "",
+						"reset_compare2": "",
+						"disablereset2": "datasources[\"loc\"][\"onoff\"]",
+						"value2": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"Consigne\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"TensionAlim\"]"
+						],
+						"legends2": "Consigne (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Tension batterie (V)",
+						"caption2": "Tracer",
+						"title2": "",
+						"numberoflegendcolumns2": 4,
+						"disable_variable2": "",
+						"re_enable_variable2": ""
+					}
+				}
+			]
+		},
+		{
+			"title": "Applications",
+			"width": 1,
+			"row": {
+				"3": 7,
+				"4": 7
+			},
+			"col": {
+				"3": 1,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "listLoadDashboard",
+					"settings": {
+						"dashboards": "./dashboards/Geeros/Menu.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Serie.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Serie.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Reseau.json,./dashboards/Geeros/Geeros_4_Reseau.json,./dashboards/Geeros/Geeros_4_Webcam_Reseau.json,./dashboards/Geeros/Geeros_4_AvecBoules_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementAngle_Reseau.json,./dashboards/Geeros/Geeros_4_Python_Reseau.json",
+						"selected_dashboard": 2,
+						"names": "Menu,Commande en tension des moteurs par liaison série,Commande en tension des moteurs par Wifi,Asservissement en vitesse des moteurs par liaison série,Asservissement en vitesse des moteurs par Wifi,Pilotage du robot,Pilotage du robot avec Webcam,Pilotage du robot avec boules,Asservissement d'angle,Programmation Python"
 					}
 				}
 			]
@@ -79,12 +158,12 @@
 			"title": "Consignes moteurs",
 			"width": 1,
 			"row": {
-				"3": 5,
+				"3": 13,
 				"4": 1,
 				"5": 9
 			},
 			"col": {
-				"3": 1,
+				"3": 2,
 				"4": 2,
 				"5": 1
 			},
@@ -159,8 +238,8 @@
 			"title": "Vitesse moteurs",
 			"width": 1,
 			"row": {
-				"3": 11,
-				"4": 11,
+				"3": 13,
+				"4": 13,
 				"5": 9
 			},
 			"col": {
@@ -171,23 +250,16 @@
 			"col_width": 1,
 			"widgets": [
 				{
-					"type": "text_widget",
+					"type": "textdouble_widget",
 					"settings": {
-						"title": "Moteur droit",
-						"size": "regular",
-						"value": "datasources[\"ws\"][\"omegaDroit\"]",
-						"animate": false,
-						"units": "rad/s"
-					}
-				},
-				{
-					"type": "text_widget",
-					"settings": {
-						"title": "Moteur gauche",
-						"size": "regular",
-						"value": "datasources[\"ws\"][\"omegaGauche\"]",
-						"animate": false,
-						"units": "rad/s"
+						"title1": "Moteur droit",
+						"size1": "regular",
+						"value1": "datasources[\"sp\"][\"omegaDroit\"]",
+						"units1": "rad/s",
+						"title2": "Moteur gauche",
+						"size2": "regular",
+						"value2": "datasources[\"sp\"][\"omegaGauche\"]",
+						"units2": "rad/s"
 					}
 				}
 			]
@@ -202,7 +274,7 @@
 			},
 			"col": {
 				"3": 3,
-				"4": 4,
+				"4": 1,
 				"5": 3
 			},
 			"col_width": 1,
@@ -217,32 +289,6 @@
 					}
 				}
 			]
-		},
-		{
-			"title": "Moniteur",
-			"width": 1,
-			"row": {
-				"3": 11,
-				"4": 5,
-				"5": 23
-			},
-			"col": {
-				"3": 2,
-				"4": 1,
-				"5": 1
-			},
-			"col_width": "1",
-			"widgets": [
-				{
-					"type": "textarea",
-					"settings": {
-						"nblines_window": "5",
-						"value": [
-							"datasources[\"ws\"][\"Raw\"]"
-						]
-					}
-				}
-			]
 		}
 	],
 	"datasources": [
@@ -254,6 +300,14 @@
 				"variables_to_send": "typeSignal,offset,amplitude,frequence,moteurint",
 				"refresh_rate": "100",
 				"checksum": "none"
+			}
+		},
+		{
+			"name": "loc",
+			"type": "local",
+			"settings": {
+				"variables": "onoff",
+				"refresh_rate": 100
 			}
 		}
 	],

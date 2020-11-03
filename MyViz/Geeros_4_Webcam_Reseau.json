@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": "0.10.12",
 	"allow_edit": true,
 	"plugins": [],
 	"panes": [
@@ -30,11 +30,107 @@
 			]
 		},
 		{
+			"title": "Démarrage",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1,
+				"5": 9
+			},
+			"col": {
+				"3": 1,
+				"4": 1,
+				"5": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "sshcommand",
+					"settings": {
+						"title": "Marche / Arrêt de l'application",
+						"style": "switch",
+						"useinputip": false,
+						"host": "192.168.0.199",
+						"login": "root",
+						"password": "raspberrypi",
+						"oncommand": "/root/programmes_python/startGeeros.sh",
+						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
+						"ontext": "ON",
+						"offtext": "OFF",
+						"appendip": false,
+						"stop_when_exit": true,
+						"initialstate": false,
+						"variable": [
+							"datasources[\"loc\"][\"onoff\"]"
+						],
+						"onvalue": "1",
+						"offvalue": "0",
+						"caption": "Switch ON",
+						"deactivation_delay_on_stop": "0",
+						"refresh_iframes": false
+					}
+				},
+				{
+					"type": "plotexplore",
+					"settings": {
+						"title": "Résultats",
+						"type1": "save",
+						"useplotdata1": false,
+						"explore_with_qats1": false,
+						"disablereset1": "datasources[\"loc\"][\"onoff\"]",
+						"value1": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"commandeDroit\"]",
+							"datasources[\"ws\"][\"commandeGauche\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"thetames\"]",
+							"datasources[\"ws\"][\"omega\"]",
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]"
+						],
+						"legends1": "Temps (s),Commande moteur droit (V),Commande moteur gauche (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Angle par rapport à la verticale (rad),Vitesse de rotation par rapport à la verticale (rad/s),Consigne vitesse longitudinale (m/s),Consigne vitesse de rotation (deg/s),Vitesse longitudinale (m/s),Vitesse de rotation (deg/s)",
+						"caption1": "Enregistrer",
+						"numberoflegendcolumns1": 2,
+						"disable_variable1": "",
+						"re_enable_variable1": "",
+						"type2": "plot",
+						"useplotdata2": false,
+						"explore_with_qats2": true,
+						"text_compare2": "",
+						"reset_compare2": "",
+						"disablereset2": "datasources[\"loc\"][\"onoff\"]",
+						"value2": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"commandeDroit\"]",
+							"datasources[\"ws\"][\"commandeGauche\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"thetames\"]",
+							"datasources[\"ws\"][\"omega\"]",
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]"
+						],
+						"legends2": "Commande moteur droit (V),Commande moteur gauche (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Angle par rapport à la verticale (rad),Vitesse de rotation par rapport à la verticale (rad/s),Consigne vitesse longitudinale (m/s),Consigne vitesse de rotation (deg/s),Vitesse longitudinale (m/s),Vitesse de rotation (deg/s)",
+						"caption2": "Tracer",
+						"title2": "",
+						"numberoflegendcolumns2": 4,
+						"disable_variable2": "",
+						"re_enable_variable2": ""
+					}
+				}
+			]
+		},
+		{
 			"title": "Pilotage",
 			"width": 1,
 			"row": {
-				"3": 5,
-				"4": 5,
+				"3": 7,
+				"4": 11,
 				"5": 1
 			},
 			"col": {
@@ -55,34 +151,24 @@
 			]
 		},
 		{
-			"title": "Démarrage",
+			"title": "Applications",
 			"width": 1,
 			"row": {
-				"3": 1,
-				"4": 1,
-				"5": 9
+				"3": 17,
+				"4": 7
 			},
 			"col": {
 				"3": 1,
-				"4": 1,
-				"5": 2
+				"4": 1
 			},
 			"col_width": 1,
 			"widgets": [
 				{
-					"type": "sshcommand",
+					"type": "listLoadDashboard",
 					"settings": {
-						"title": "Marche / Arrêt de l'application",
-						"style": "switch",
-						"host": "192.168.0.199",
-						"login": "root",
-						"password": "raspberrypi",
-						"oncommand": "/root/programmes_python/startGeeros.sh",
-						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
-						"ontext": "ON",
-						"offtext": "OFF",
-						"initialstate": false,
-						"caption": "Switch ON"
+						"dashboards": "./dashboards/Geeros/Menu.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Serie.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Serie.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Reseau.json,./dashboards/Geeros/Geeros_4_Reseau.json,./dashboards/Geeros/Geeros_4_Webcam_Reseau.json,./dashboards/Geeros/Geeros_4_AvecBoules_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementAngle_Reseau.json,./dashboards/Geeros/Geeros_4_Python_Reseau.json",
+						"selected_dashboard": 6,
+						"names": "Menu,Commande en tension des moteurs par liaison série,Commande en tension des moteurs par Wifi,Asservissement en vitesse des moteurs par liaison série,Asservissement en vitesse des moteurs par Wifi,Pilotage du robot,Pilotage du robot avec Webcam,Pilotage du robot avec boules,Asservissement d'angle,Programmation Python"
 					}
 				}
 			]
@@ -91,8 +177,8 @@
 			"title": "Servomoteur",
 			"width": 1,
 			"row": {
-				"3": 15,
-				"4": 15,
+				"3": 21,
+				"4": 21,
 				"5": 15
 			},
 			"col": {
@@ -117,32 +203,6 @@
 					}
 				}
 			]
-		},
-		{
-			"title": "Moniteur",
-			"width": 1,
-			"row": {
-				"3": 21,
-				"4": 21,
-				"5": 23
-			},
-			"col": {
-				"3": 1,
-				"4": 1,
-				"5": 1
-			},
-			"col_width": "2",
-			"widgets": [
-				{
-					"type": "textarea",
-					"settings": {
-						"nblines_window": "10",
-						"value": [
-							"datasources[\"ws\"][\"Raw\"]"
-						]
-					}
-				}
-			]
 		}
 	],
 	"datasources": [
@@ -154,6 +214,14 @@
 				"variables_to_send": "vref,xiref,servoref",
 				"refresh_rate": "100",
 				"checksum": "none"
+			}
+		},
+		{
+			"name": "loc",
+			"type": "local",
+			"settings": {
+				"variables": "onoff",
+				"refresh_rate": 100
 			}
 		}
 	],

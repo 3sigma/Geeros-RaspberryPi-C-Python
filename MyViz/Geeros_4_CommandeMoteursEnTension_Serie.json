@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": "0.10.12",
 	"allow_edit": true,
 	"plugins": [],
 	"panes": [
@@ -64,7 +64,54 @@
 						"serialport": "sp",
 						"ontext": "ON",
 						"offtext": "OFF",
-						"initialstate": false
+						"initialstate": false,
+						"switch_off_on_disable": false,
+						"variable1": "datasources[\"loc\"][\"onoff\"]",
+						"value1": "1",
+						"switchoff_variable1": "datasources[\"loc\"][\"onoff\"]",
+						"switchoff_value1": "0",
+						"message": "return \"<span style='color:red'>Attention: lire la doc avant<br>d'exécuter cette application</span>\";"
+					}
+				},
+				{
+					"type": "plotexplore",
+					"settings": {
+						"title": "Résultats",
+						"type1": "save",
+						"useplotdata1": false,
+						"explore_with_qats1": false,
+						"disablereset1": "datasources[\"loc\"][\"onoff\"]",
+						"value1": [
+							"datasources[\"sp\"][\"Temps\"]",
+							"datasources[\"sp\"][\"Consigne\"]",
+							"datasources[\"sp\"][\"omegaDroit\"]",
+							"datasources[\"sp\"][\"omegaGauche\"]",
+							"datasources[\"sp\"][\"TensionAlim\"]"
+						],
+						"legends1": "Temps (s),Consigne (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Tension batterie (V)",
+						"caption1": "Enregistrer",
+						"numberoflegendcolumns1": 2,
+						"disable_variable1": "",
+						"re_enable_variable1": "",
+						"type2": "plot",
+						"useplotdata2": false,
+						"explore_with_qats2": true,
+						"text_compare2": "",
+						"reset_compare2": "",
+						"disablereset2": "datasources[\"loc\"][\"onoff\"]",
+						"value2": [
+							"datasources[\"sp\"][\"Temps\"]",
+							"datasources[\"sp\"][\"Consigne\"]",
+							"datasources[\"sp\"][\"omegaDroit\"]",
+							"datasources[\"sp\"][\"omegaGauche\"]",
+							"datasources[\"sp\"][\"TensionAlim\"]"
+						],
+						"legends2": "Consigne (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Tension batterie (V)",
+						"caption2": "Tracer",
+						"title2": "",
+						"numberoflegendcolumns2": 4,
+						"disable_variable2": "",
+						"re_enable_variable2": ""
 					}
 				}
 			]
@@ -73,12 +120,12 @@
 			"title": "Consignes moteurs",
 			"width": 1,
 			"row": {
-				"3": 5,
+				"3": 11,
 				"4": 1,
 				"5": 9
 			},
 			"col": {
-				"3": 1,
+				"3": 2,
 				"4": 2,
 				"5": 1
 			},
@@ -150,16 +197,69 @@
 			]
 		},
 		{
+			"title": "Applications",
+			"width": 1,
+			"row": {
+				"3": 11,
+				"4": 7
+			},
+			"col": {
+				"3": 3,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "listLoadDashboard",
+					"settings": {
+						"dashboards": "./dashboards/Geeros/Menu.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Serie.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Serie.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Reseau.json,./dashboards/Geeros/Geeros_4_Reseau.json,./dashboards/Geeros/Geeros_4_Webcam_Reseau.json,./dashboards/Geeros/Geeros_4_AvecBoules_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementAngle_Reseau.json,./dashboards/Geeros/Geeros_4_Python_Reseau.json",
+						"selected_dashboard": 1,
+						"names": "Menu,Commande en tension des moteurs par liaison série,Commande en tension des moteurs par Wifi,Asservissement en vitesse des moteurs par liaison série,Asservissement en vitesse des moteurs par Wifi,Pilotage du robot,Pilotage du robot avec Webcam,Pilotage du robot avec boules,Asservissement d'angle,Programmation Python"
+					}
+				}
+			]
+		},
+		{
+			"title": "Vitesse moteurs",
+			"width": 1,
+			"row": {
+				"3": 15,
+				"4": 11,
+				"5": 9
+			},
+			"col": {
+				"3": 3,
+				"4": 3,
+				"5": 3
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "textdouble_widget",
+					"settings": {
+						"title1": "Moteur droit",
+						"size1": "regular",
+						"value1": "datasources[\"sp\"][\"omegaDroit\"]",
+						"units1": "rad/s",
+						"title2": "Moteur gauche",
+						"size2": "regular",
+						"value2": "datasources[\"sp\"][\"omegaGauche\"]",
+						"units2": "rad/s"
+					}
+				}
+			]
+		},
+		{
 			"title": "Tension batterie",
 			"width": 1,
 			"row": {
-				"3": 17,
+				"3": 19,
 				"4": 11,
 				"5": 17
 			},
 			"col": {
 				"3": 3,
-				"4": 4,
+				"4": 1,
 				"5": 3
 			},
 			"col_width": 1,
@@ -174,69 +274,6 @@
 					}
 				}
 			]
-		},
-		{
-			"title": "Vitesse moteurs",
-			"width": 1,
-			"row": {
-				"3": 11,
-				"4": 11,
-				"5": 9
-			},
-			"col": {
-				"3": 3,
-				"4": 3,
-				"5": 3
-			},
-			"col_width": 1,
-			"widgets": [
-				{
-					"type": "text_widget",
-					"settings": {
-						"title": "Moteur droit",
-						"size": "regular",
-						"value": "datasources[\"sp\"][\"omegaDroit\"]",
-						"animate": false,
-						"units": "rad/s"
-					}
-				},
-				{
-					"type": "text_widget",
-					"settings": {
-						"title": "Moteur gauche",
-						"size": "regular",
-						"value": "datasources[\"sp\"][\"omegaGauche\"]",
-						"animate": false,
-						"units": "rad/s"
-					}
-				}
-			]
-		},
-		{
-			"title": "Moniteur",
-			"width": 1,
-			"row": {
-				"3": 11,
-				"4": 5,
-				"5": 23
-			},
-			"col": {
-				"3": 2,
-				"4": 1,
-				"5": 1
-			},
-			"col_width": "1",
-			"widgets": [
-				{
-					"type": "textarea",
-					"settings": {
-						"nblines_window": "5",
-						"value": [
-							"datasources[\"sp\"][\"_rawdata\"]"
-						]
-					}
-				}
-			]
 		}
 	],
 	"datasources": [
@@ -244,14 +281,29 @@
 			"name": "sp",
 			"type": "serialport",
 			"settings": {
+				"use_default_port": true,
 				"port": "COM9",
 				"baudrate": 115200,
 				"variables_to_read": "Temps,TCopie,Consigne,omegaDroit,omegaGauche,TensionAlim",
 				"variables_to_send": "typeSignal,offset,amplitude,frequence,moteurint",
+				"delay": 0,
 				"refresh_rate": 100,
 				"separator": ",",
+				"send_as_string": true,
+				"datatype": "int8",
+				"add_newline": true,
 				"checksum": "sum",
-				"immediate_startup": false
+				"immediate_startup": false,
+				"initialchecksum": "none",
+				"initialdelay": 2000
+			}
+		},
+		{
+			"name": "loc",
+			"type": "local",
+			"settings": {
+				"variables": "onoff",
+				"refresh_rate": 100
 			}
 		}
 	],
