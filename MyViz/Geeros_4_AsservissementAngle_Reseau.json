@@ -1,0 +1,448 @@
+{
+	"version": "0.10.12",
+	"allow_edit": true,
+	"plugins": [],
+	"panes": [
+		{
+			"title": "Démarrage",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1,
+				"5": 9
+			},
+			"col": {
+				"3": 1,
+				"4": 1,
+				"5": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "sshcommand",
+					"settings": {
+						"title": "Marche / Arrêt de l'application",
+						"style": "switch",
+						"useinputip": false,
+						"host": "192.168.0.199",
+						"login": "root",
+						"password": "raspberrypi",
+						"oncommand": "/root/programmes_python/startAsservissementAngle.sh",
+						"offcommand": "/root/programmes_python/stopPythonPWM.sh",
+						"ontext": "ON",
+						"offtext": "OFF",
+						"appendip": false,
+						"stop_when_exit": true,
+						"initialstate": false,
+						"variable": [
+							"datasources[\"loc\"][\"onoff\"]"
+						],
+						"onvalue": "1",
+						"offvalue": "0",
+						"caption": "Exécuter",
+						"deactivation_delay_on_stop": "0",
+						"refresh_iframes": false
+					}
+				},
+				{
+					"type": "plotexplore",
+					"settings": {
+						"title": "Résultats",
+						"type1": "save",
+						"useplotdata1": false,
+						"explore_with_qats1": false,
+						"disablereset1": "datasources[\"loc\"][\"onoff\"]",
+						"value1": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"commandeDroit\"]",
+							"datasources[\"ws\"][\"commandeGauche\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"thetames\"]",
+							"datasources[\"ws\"][\"omega\"]",
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]",
+							"datasources[\"ws\"][\"consigne_psi\"]",
+							"datasources[\"ws\"][\"Angle\"]"
+						],
+						"legends1": "Temps (s),Commande moteur droit (V),Commande moteur gauche (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Angle par rapport à la verticale (rad),Vitesse de rotation par rapport à la verticale (rad/s),Consigne vitesse longitudinale (m/s),Consigne vitesse de rotation (deg/s),Vitesse longitudinale (m/s),Vitesse de rotation (deg/s),Consigne d'angle (deg),Angle (deg)",
+						"caption1": "Enregistrer",
+						"numberoflegendcolumns1": 2,
+						"disable_variable1": "",
+						"re_enable_variable1": "",
+						"type2": "plot",
+						"useplotdata2": false,
+						"explore_with_qats2": true,
+						"text_compare2": "",
+						"reset_compare2": "",
+						"disablereset2": "datasources[\"loc\"][\"onoff\"]",
+						"value2": [
+							"datasources[\"ws\"][\"Temps\"]",
+							"datasources[\"ws\"][\"commandeDroit\"]",
+							"datasources[\"ws\"][\"commandeGauche\"]",
+							"datasources[\"ws\"][\"omegaDroit\"]",
+							"datasources[\"ws\"][\"omegaGauche\"]",
+							"datasources[\"ws\"][\"thetames\"]",
+							"datasources[\"ws\"][\"omega\"]",
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]",
+							"datasources[\"ws\"][\"consigne_psi\"]",
+							"datasources[\"ws\"][\"Angle\"]"
+						],
+						"legends2": "Commande moteur droit (V),Commande moteur gauche (V),Vitesse moteur droit (rad/s),Vitesse moteur gauche (rad/s),Angle par rapport à la verticale (rad),Vitesse de rotation par rapport à la verticale (rad/s),Consigne vitesse longitudinale (m/s),Consigne vitesse de rotation (deg/s),Vitesse longitudinale (m/s),Vitesse de rotation (deg/s),Consigne d'angle (deg),Angle (deg)",
+						"caption2": "Tracer",
+						"title2": "",
+						"numberoflegendcolumns2": 4,
+						"disable_variable2": "",
+						"re_enable_variable2": ""
+					}
+				}
+			]
+		},
+		{
+			"title": "Consignes",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 1,
+				"5": 5
+			},
+			"col": {
+				"3": 2,
+				"4": 2,
+				"5": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Vitesse de suivi (cm/s)",
+						"variable": "datasources[\"ws\"][\"vref\"]",
+						"initialvalue": 0,
+						"min": 0,
+						"max": 50,
+						"resolution": 0,
+						"resetvalue": 0,
+						"resetcaption": "Réinitialisation",
+						"continuous_update": true
+					}
+				},
+				{
+					"type": "slider",
+					"settings": {
+						"title": "Consigne d'anle (deg)",
+						"variable": "datasources[\"ws\"][\"psiref\"]",
+						"initialvalue": 0,
+						"min": -180,
+						"max": 180,
+						"resolution": 0,
+						"resetvalue": 0,
+						"resetcaption": "Réinitialisation",
+						"continuous_update": true
+					}
+				}
+			]
+		},
+		{
+			"title": "Correcteur d'angle",
+			"width": 1,
+			"row": {
+				"3": 1,
+				"4": 11
+			},
+			"col": {
+				"3": 3,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "pidsat",
+					"settings": {
+						"possiblechoices": "0,0,0,0,0,0,0,0,0,1,0",
+						"initialstate": "9",
+						"Kpvariable": "datasources[\"ws\"][\"Kp\"]",
+						"Kpformula": "x",
+						"Kpinitialvalue": 2,
+						"Kpmin": 0,
+						"Kpmax": 10,
+						"Kpresolution": 1,
+						"Kpresetvalue": 2,
+						"Kpresetcaption": "Réinitialisation",
+						"Kivariable": "datasources[\"ws\"][\"Ki\"]",
+						"Kiformula": "x",
+						"Kiinitialvalue": 0,
+						"Kimin": 0,
+						"Kimax": 2,
+						"Kiresolution": 1,
+						"Kiresetvalue": 0,
+						"Kiresetcaption": "Réinitialisation",
+						"Kdvariable": "datasources[\"ws\"][\"Kd\"]",
+						"Kdformula": "x",
+						"Kdinitialvalue": 0,
+						"Kdmin": 0,
+						"Kdmax": 0.002,
+						"Kdresolution": 3,
+						"Kdresetvalue": 0,
+						"Kdresetcaption": "Réinitialisation",
+						"Satvariable": "datasources[\"ws\"][\"ximax\"]",
+						"unit": "deg/s",
+						"Satformula": "x",
+						"Satinitialvalue": 100,
+						"Satmin": 0,
+						"Satmax": 200,
+						"Satresolution": 1,
+						"Satresetvalue": 100,
+						"Satresetcaption": "Réinitialisation",
+						"hiddenid": 1
+					}
+				}
+			]
+		},
+		{
+			"title": "Correcteur de vitesse angulaire",
+			"width": 1,
+			"row": {
+				"3": 13,
+				"4": 15
+			},
+			"col": {
+				"3": 3,
+				"4": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "pidsat",
+					"settings": {
+						"possiblechoices": "0,0,0,0,1,0,0,0,0,0,0",
+						"initialstate": "4",
+						"Kpvariable": "datasources[\"ws\"][\"Kpv\"]",
+						"Kpformula": "x",
+						"Kpinitialvalue": 0,
+						"Kpmin": 0,
+						"Kpmax": 2,
+						"Kpresolution": 1,
+						"Kpresetvalue": 0,
+						"Kpresetcaption": "Réinitialisation",
+						"Kivariable": "datasources[\"ws\"][\"Kiv\"]",
+						"Kiformula": "x",
+						"Kiinitialvalue": 2,
+						"Kimin": 0,
+						"Kimax": 5,
+						"Kiresolution": 1,
+						"Kiresetvalue": 2,
+						"Kiresetcaption": "Réinitialisation",
+						"Kdvariable": "datasources[\"ws\"][\"Kdv\"]",
+						"Kdformula": "x",
+						"Kdinitialvalue": 0,
+						"Kdmin": 0,
+						"Kdmax": 0.002,
+						"Kdresolution": 3,
+						"Kdresetvalue": 0,
+						"Kdresetcaption": "Réinitialisation",
+						"Satvariable": "",
+						"unit": "deg/s",
+						"Satformula": "x",
+						"Satinitialvalue": 50,
+						"Satmin": 0,
+						"Satmax": 100,
+						"Satresolution": 1,
+						"Satresetvalue": 50,
+						"Satresetcaption": "Réinitialisation",
+						"hiddenid": 2
+					}
+				}
+			]
+		},
+		{
+			"title": "Applications",
+			"width": 1,
+			"row": {
+				"3": 23,
+				"4": 7
+			},
+			"col": {
+				"3": 3,
+				"4": 1
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "listLoadDashboard",
+					"settings": {
+						"dashboards": "./dashboards/Geeros/Menu.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Serie.json,./dashboards/Geeros/Geeros_4_CommandeMoteursEnTension_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Serie.json,./dashboards/Geeros/Geeros_4_AsservissementMoteursEnVitesse_Reseau.json,./dashboards/Geeros/Geeros_4_Reseau.json,./dashboards/Geeros/Geeros_4_Webcam_Reseau.json,./dashboards/Geeros/Geeros_4_AvecBoules_Reseau.json,./dashboards/Geeros/Geeros_4_AsservissementAngle_Reseau.json,./dashboards/Geeros/Geeros_4_Python_Reseau.json",
+						"selected_dashboard": 8,
+						"names": "Menu,Commande en tension des moteurs par liaison série,Commande en tension des moteurs par Wifi,Asservissement en vitesse des moteurs par liaison série,Asservissement en vitesse des moteurs par Wifi,Pilotage du robot,Pilotage du robot avec Webcam,Pilotage du robot avec boules,Asservissement d'angle,Programmation Python"
+					}
+				}
+			]
+		},
+		{
+			"title": "Télémétrie",
+			"width": 1,
+			"row": {
+				"2": 9,
+				"3": 27,
+				"4": 1,
+				"5": 7
+			},
+			"col": {
+				"2": 2,
+				"3": 2,
+				"4": 3,
+				"5": 3
+			},
+			"col_width": "2",
+			"widgets": [
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Angles (deg)",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"legendX": "Temps (s)",
+						"time_window": 10,
+						"value": [
+							"datasources[\"ws\"][\"consigne_psi\"]",
+							"datasources[\"ws\"][\"Angle\"]"
+						],
+						"y_axis_min_range": "-10,10",
+						"offset_y": "0",
+						"y2value": [],
+						"y2_axis_min_range": "-10,10",
+						"offset_y2": "0",
+						"include_legend": true,
+						"legendStr": "Angle ref,Angle",
+						"height": 4,
+						"pausable": true,
+						"legendoutside": false,
+						"numberofcolumns": 2,
+						"refreshperiod": 50
+					}
+				},
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Vitesses longitudinales (cm/s)",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"legendX": "Temps (s)",
+						"time_window": 10,
+						"value": [
+							"datasources[\"ws\"][\"Consigne vitesse longitudinale\"]",
+							"datasources[\"ws\"][\"Vitesse longitudinale\"]"
+						],
+						"y_axis_min_range": "-1,1",
+						"offset_y": "0",
+						"y2value": [],
+						"y2_axis_min_range": "-10,10",
+						"offset_y2": "0",
+						"include_legend": true,
+						"legendStr": "vref,vmes",
+						"height": 4,
+						"pausable": true,
+						"legendoutside": false,
+						"numberofcolumns": 2,
+						"refreshperiod": 50
+					}
+				},
+				{
+					"type": "plot",
+					"settings": {
+						"title": "Vitesses de rotation (deg/s)",
+						"xaxis": "datasource_column",
+						"time": "datasources[\"ws\"][\"Temps\"]",
+						"legendX": "Temps (s)",
+						"time_window": 10,
+						"value": [
+							"datasources[\"ws\"][\"Consigne vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation\"]",
+							"datasources[\"ws\"][\"Vitesse de rotation gyro\"]"
+						],
+						"y_axis_min_range": "-1,1",
+						"offset_y": "0",
+						"y2value": [],
+						"y2_axis_min_range": "-1,1",
+						"offset_y2": "0",
+						"include_legend": true,
+						"legendStr": "xiref,xi,gz",
+						"height": 4,
+						"pausable": true,
+						"legendoutside": false,
+						"numberofcolumns": 2,
+						"refreshperiod": 50
+					}
+				}
+			]
+		},
+		{
+			"title": "Mesures",
+			"width": 1,
+			"row": {
+				"3": 48,
+				"4": 9,
+				"5": 7
+			},
+			"col": {
+				"3": 2,
+				"4": 2,
+				"5": 2
+			},
+			"col_width": 1,
+			"widgets": [
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Vitesse de suivi",
+						"size": "regular",
+						"value": "datasources[\"ws\"][\"Vitesse longitudinale\"]",
+						"animate": false,
+						"units": "cm/s",
+						"height": 1
+					}
+				},
+				{
+					"type": "text_widget",
+					"settings": {
+						"title": "Angle",
+						"size": "regular",
+						"value": "datasources[\"ws\"][\"Angle\"]",
+						"animate": false,
+						"units": "deg",
+						"height": 1
+					}
+				}
+			]
+		}
+	],
+	"datasources": [
+		{
+			"name": "ws",
+			"type": "websocket",
+			"settings": {
+				"host": "ws://192.168.0.199:9090/ws",
+				"usesettingsip": false,
+				"portisunique": false,
+				"variables_to_send": "vref,psiref,Kp,Ki,Kd,ximax,Kpv,Kiv,Kdv",
+				"refresh_rate": "500",
+				"checksum": "none",
+				"name": "ws"
+			}
+		},
+		{
+			"name": "loc",
+			"type": "local",
+			"settings": {
+				"variables": "onoff",
+				"refresh_rate": 100
+			}
+		}
+	],
+	"columns": 4
+}
