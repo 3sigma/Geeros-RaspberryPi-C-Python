@@ -296,6 +296,8 @@ void loop() {
             ticksCodeurDroit = 0;
             ticksCodeurGauche = 0;
 
+            temps = 0;
+
         }
         else {
             // On garde tout à zéro
@@ -419,26 +421,26 @@ void isrt() {
     // - xiref permet de définir la consigne de vitesse de rotation (rad/s) autour de l'axe vertical
     //   xiref doit rester inférieur à 3 rad/s
     // Ci-dessous, le robot décrit un 8
-    //  if (temps > Tmax) {
-    //    Tmax = temps + 6.; // Le 8 dure 6 s
-    //  }
-    //  else if (temps < (Tmax-5.5)) { // La ligne droite dure 0.5 s
-    //    vxref = 0.3;
-    //    xiref = 0.;
-    //  }
-    //  else if (temps < (Tmax-3.)) { // Le virage dure 2.5 s
-    //    vxref = 0.3;
-    //    xiref = 2.;
-    //  }
-    //  else if (temps < (Tmax-2.5)) { // La ligne droite dure 0.5 s
-    //    vxref = 0.3;
-    //    xiref = 0.;
-    //  }
-    //  else { // // Le virage dure 2.5 s
-    //    vxref = 0.3;
-    //    xiref = -2.;
-    //  }
-
+//    if (temps > Tmax) {
+//      Tmax = temps + 6.; // Le 8 dure 6 s
+//    }
+//    else if (temps < (Tmax-5.5)) { // La ligne droite dure 0.5 s
+//      vxref = 0.3;
+//      xiref = 0.;
+//    }
+//    else if (temps < (Tmax-3.)) { // Le virage dure 2.5 s
+//      vxref = 0.3;
+//      xiref = 2.;
+//    }
+//    else if (temps < (Tmax-2.5)) { // La ligne droite dure 0.5 s
+//      vxref = 0.3;
+//      xiref = 0.;
+//    }
+//    else { // // Le virage dure 2.5 s
+//      vxref = 0.3;
+//      xiref = -2.;
+//    }
+    // Partie à commenter ci-dessous pour que la manoeuvre ci-dessus soit active
     vxref = 0.;
     xiref = 0.;
 
@@ -577,7 +579,3 @@ void GestionInterruptionCodeurGauchePinA() {
         ticksCodeurGauche--;
     }
 }
-
-
-
-
